@@ -1,8 +1,22 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 
 event_route_bp = Blueprint("evente_route", __name__)
 
+from src.validators.events_creator_validator import events_creator_validator
+from src.http_types.http_request import HttpRequest
+from src.controllers.events.events_creator import EventsCreator
+from src.model.repositories.eventos_repository import EventosRepository
+
 @event_route_bp.route("/event", methods=["POST"])
 def create_new_event():
-    return jsonify({ "estou": "aqui" }), 201
+    
+    events_creator_validator(request)
+    http_request = HttpRequest(body=request.json)
+
+    events_repo = EventosRepository()
+    events_creator = EventsCreator(events_repo)
+
+    http_response = events_creator.create(http_request)
+
+    return jsonify(http_response.body), http_response.status_code
 
