@@ -10,6 +10,9 @@ from src.model.repositories.subscribers_repository import SubscribersRepository
 
 from src.controllers.subscribers.subscribers_creator import SubscribersCreator
 
+from src.controllers.subscribers.subscriber_manager import subscriberManager
+
+
 @subs_route_bp.route("/subscriber", methods=["POST"])
 def create_new_subs():
     
@@ -22,4 +25,30 @@ def create_new_subs():
     http_response = subs_creator.create(http_request)
 
     return jsonify(http_response.body), http_response.status_code
+
+@subs_route_bp.route("/subscriber/link/<link>/event/<event_id>", methods=["GET"])
+def subscribers_by_link(link, event_id):
+    
+    subs_repo = SubscribersRepository()
+    subs_manager = subscriberManager(subs_repo)
+
+    http_request = HttpRequest(param={"link": link, "event_id": event_id})
+
+    http_response = subs_manager.get_subscribers_by_link(http_request)
+
+    return jsonify(http_response.body), http_response.status_code
+
+
+@subs_route_bp.route("/subscriber/ranking/event/<event_id>", methods=["GET"])
+def link_ranking(event_id):
+    
+    subs_repo = SubscribersRepository()
+    subs_manager = subscriberManager(subs_repo)
+
+    http_request = HttpRequest(param={"event_id": event_id})
+
+    http_response = subs_manager.get_event_ranking(http_request)
+
+    return jsonify(http_response.body), http_response.status_code
+
 
